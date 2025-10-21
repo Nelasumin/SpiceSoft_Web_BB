@@ -61,6 +61,11 @@ body.crt { margin: 0; background: var(--bg); color: var(--fg); font-family: "Cou
 .content h2, .content h3 { margin-top: 20px; }
 .content p { margin: 0 0 12px; }
 
+/* Emphasis for specific content lines */
+.content .big-title { font-size: 2.4rem; line-height: 1.2; letter-spacing: 0.5px; }
+.content .big-line { font-size: 1.4rem; font-weight: bold; }
+.content .big-line code { font-size: 1.1em; }
+
 /* Code */
 pre, code { background: #0b0b0b; border: 1px solid #0f3; }
 pre { padding: 10px; overflow: auto; }

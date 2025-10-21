@@ -10,7 +10,17 @@
         <loc>https://board.spicesoft.cn/categories/</loc>
     </url>
     <url>
+        <loc>https://board.spicesoft.cn/page/1/</loc>
+    </url>
+    <url>
         <loc>https://board.spicesoft.cn/posts/</loc>
+    </url>
+    <url>
+        <loc>https://board.spicesoft.cn/posts/page/1/</loc>
+    </url>
+    <url>
+        <loc>https://board.spicesoft.cn/posts/server-address/</loc>
+        <lastmod>2025-10-21</lastmod>
     </url>
     <url>
         <loc>https://board.spicesoft.cn/tags/</loc>
