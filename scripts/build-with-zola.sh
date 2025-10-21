@@ -3,7 +3,7 @@ set -euo pipefail
 
 REPO="getzola/zola"
 ASSET="x86_64-unknown-linux-gnu.tar.gz"
-VERSION="${ZOLA_VERSION:-}"
+VERSION="v0.21.0"
 BIN_DIR=".bin"
 
 get_download_url() {
@@ -11,7 +11,6 @@ get_download_url() {
     echo "https://github.com/${REPO}/releases/download/${VERSION}/zola-${VERSION}-${ASSET}"
     return
   fi
-  echo "Resolving latest Zola release asset for ${ASSET}..."
   local url
   url=$(curl -fsSL https://api.github.com/repos/${REPO}/releases/latest \
     | grep -Eo "https://[^\"]+${ASSET}" \
@@ -19,12 +18,13 @@ get_download_url() {
   if [ -n "$url" ]; then
     echo "$url"
   else
-    local fallback="v0.19.2"
+    local fallback="v0.21.0"
     echo "https://github.com/${REPO}/releases/download/${fallback}/zola-${fallback}-${ASSET}"
   fi
 }
 
-ZOLA_URL=$(get_download_url)
+echo "Resolving latest Zola release asset for ${ASSET}..."
+ZOLA_URL=$(get_download_url | tr -d '\r\n')
 echo "Downloading Zola (Linux x86_64) from: ${ZOLA_URL}"
 curl -fsSL -H "Accept: application/octet-stream" "${ZOLA_URL}" -o zola.tgz
 
