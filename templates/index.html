@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}{{ section.title | default(value="服务器公告栏") }} - {{ config.title }}{% endblock title %}
+{% block content %}
+  <section class="hero">
+    <h1>{{ section.title | default(value="服务器公告栏") }}</h1>
+    <p class="desc">发布维护通知、故障通告与更新说明</p>
+  </section>
+
+  <div class="filter-bar">
+    <label>筛选：</label>
+    <select id="severity">
+      <option value="all">所有类型</option>
+      <option value="info">通知</option>
+      <option value="maintenance">维护</option>
+      <option value="outage">故障</option>
+      <option value="security">安全</option>
+    </select>
+    <select id="status">
+      <option value="all">全部状态</option>
+      <option value="active">进行中</option>
+      <option value="resolved">已解决</option>
+    </select>
+    <input id="search" type="search" placeholder="搜索公告..." />
+  </div>
+
+  {# 使用分页页集；若未启用分页则回退 #}
+  {% if paginator is defined %}
+    {% set items = paginator.pages %}
+  {% else %}
+    {% set items = section.pages %}
+    {% set posts_section = get_section(path="posts/_index.md") %}
+    {% if items | length == 0 and posts_section is defined %}
+      {% set items = posts_section.pages %}
+    {% endif %}
+  {% endif %}
+
+  {% if items | length > 0 %}
+    {# 置顶公告 #}
+    {% for page in items %}
+      {% if page.extra.pinned %}
+        {% set sev = page.extra.severity | default(value="info") %}
+        {% set stat = page.extra.status | default(value="active") %}
+        {% set sev_label = "通知" %}
+        {% if sev == "maintenance" %}{% set sev_label = "维护" %}
+        {% elif sev == "outage" %}{% set sev_label = "故障" %}
+        {% elif sev == "security" %}{% set sev_label = "安全" %}
+        {% elif sev != "info" %}{% set sev_label = "其他" %}{% endif %}
+        <article class="card pinned" data-severity="{{ sev }}" data-status="{{ stat }}" data-pinned="true">
+          <div class="card-head">
+            <span class="badge badge-pinned">置顶</span>
+            <span class="badge badge-{{ sev }}">{{ sev_label }}</span>
+            <span class="badge badge-status-{{ stat }}">{% if stat == "active" %}进行中{% else %}已解决{% endif %}</span>
+          </div>
+          <h2><a href="{{ page.permalink }}">{{ page.title }}</a></h2>
+          {% if page.date %}<time datetime="{{ page.date | date(format="%Y-%m-%d") }}">{{ page.date | date(format="%Y-%m-%d") }}</time>{% endif %}
+          {% if page.summary %}<p>{{ page.summary | safe }}</p>{% endif %}
+        </article>
+      {% endif %}
+    {% endfor %}
+
+    <div class="list" id="cards">
+      {% for page in items %}
+        {% if not page.extra.pinned %}
+          {% set sev = page.extra.severity | default(value="info") %}
+          {% set stat = page.extra.status | default(value="active") %}
+          {% set sev_label = "通知" %}
+          {% if sev == "maintenance" %}{% set sev_label = "维护" %}
+          {% elif sev == "outage" %}{% set sev_label = "故障" %}
+          {% elif sev == "security" %}{% set sev_label = "安全" %}
+          {% elif sev != "info" %}{% set sev_label = "其他" %}{% endif %}
+          <article class="card" data-severity="{{ sev }}" data-status="{{ stat }}" data-pinned="false">
+            <div class="card-head">
+              <span class="badge badge-{{ sev }}">{{ sev_label }}</span>
+              <span class="badge badge-status-{{ stat }}">{% if stat == "active" %}进行中{% else %}已解决{% endif %}</span>
+            </div>
+            <h2><a href="{{ page.permalink }}">{{ page.title }}</a></h2>
+            {% if page.date %}<time datetime="{{ page.date | date(format="%Y-%m-%d") }}">{{ page.date | date(format="%Y-%m-%d") }}</time>{% endif %}
+            {% if page.summary %}<p>{{ page.summary | safe }}</p>{% endif %}
+            {% if page.taxonomies and page.taxonomies.tags %}
+              <div class="tags">
+                {% for tag in page.taxonomies.tags %}
+                  <a class="tag" href="{{ get_taxonomy_url(kind='tags', name=tag) }}">#{{ tag }}</a>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </article>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    {# 分页导航 #}
+    {% if paginator is defined and paginator.number_pagers > 1 %}
+      <nav class="pager" aria-label="分页导航">
+        <span class="muted">第 {{ paginator.current_index }} / {{ paginator.number_pagers }} 页</span>
+        {% if paginator.previous %}
+          <a class="prev" href="{{ paginator.previous }}">上一页</a>
+        {% endif %}
+        {% if paginator.next %}
+          <a class="next" href="{{ paginator.next }}">下一页</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  {% else %}
+    <p class="muted">还没有公告，稍后再来~</p>
+  {% endif %}
+
+  <script src="{{ get_url(path='js/board.js', cachebust=true) }}"></script>
+{% endblock content %}

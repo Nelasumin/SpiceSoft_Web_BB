@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% block title %}
+  <title>
+    {% if page is defined and page.title %}{{ page.title }} - {{ config.title }}
+    {% elif section is defined and section.title %}{{ section.title }} - {{ config.title }}
+    {% elif taxonomy is defined %}{{ taxonomy.name | capitalize }} - {{ config.title }}
+    {% elif term is defined %}{{ term.name }} - {{ config.title }}
+    {% else %}{{ config.title }}
+    {% endif %}
+  </title>
+  {% endblock title %}
+  {% if page is defined and page.description %}
+    <meta name="description" content="{{ page.description }}">
+  {% elif section is defined and section.description %}
+    <meta name="description" content="{{ section.description }}">
+  {% elif taxonomy is defined %}
+    <meta name="description" content="{{ taxonomy.name | capitalize }}">
+  {% elif term is defined %}
+    <meta name="description" content="{{ term.name }}">
+  {% else %}
+    <meta name="description" content="{{ config.description }}">
+  {% endif %}
+  <link rel="stylesheet" href="{{ get_url(path='main.css', cachebust=true) }}">
+</head>
+<body class="crt">
+  <div class="screen">
+    <header class="bar">
+      <div class="logo">SpiceSoft</div>
+      <nav class="nav">
+        {% for item in config.extra.menu %}
+          {% if item.path == "/" %}
+            <a href="/" class="nav-item">{{ item.name }}</a>
+          {% else %}
+            <a href="/{{ item.path }}/" class="nav-item">{{ item.name }}</a>
+          {% endif %}
+        {% endfor %}
+      </nav>
+    </header>
+    <main class="container">
+      {% block content %}{% endblock content %}
+    </main>
+    <footer class="bar footer">
+      <span>© {{ now() | date(format="%Y") }} {{ config.title }}</span>
+      <span class="muted">Powered by Zola</span>
+    </footer>
+  </div>
+</body>
+</html>

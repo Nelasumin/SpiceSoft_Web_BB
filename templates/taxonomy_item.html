@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}{{ term.name }} - {{ config.title }}{% endblock title %}
+{% block content %}
+  <h1>{{ term.name }}</h1>
+  {% if term.pages | length > 0 %}
+    {% for page in term.pages %}
+      <article class="card">
+        <h2><a href="{{ page.permalink }}">{{ page.title }}</a></h2>
+        {% if page.date %}<time datetime="{{ page.date | date(format="%Y-%m-%d") }}">{{ page.date | date(format="%Y-%m-%d") }}</time>{% endif %}
+        {% if page.summary %}<p>{{ page.summary | safe }}</p>{% endif %}
+      </article>
+    {% endfor %}
+  {% else %}
+    <p class="muted">此项下暂无文章。</p>
+  {% endif %}
+{% endblock content %}

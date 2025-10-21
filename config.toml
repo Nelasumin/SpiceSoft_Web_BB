@@ -1,0 +1,30 @@
+# The URL the site will be built for
+base_url = "https://board.spicesoft.cn"
+
+# Site info
+title = "服务器公告栏"
+description = "发布维护通知、故障通告与更新说明"
+
+# Build options
+compile_sass = true
+build_search_index = true
+
+# Taxonomies for categories & tags
+taxonomies = [
+  { name = "categories", rss = true },
+  { name = "tags", rss = true }
+]
+
+[markdown]
+# Code highlight
+highlight_code = true
+highlight_theme = "ayu-mirage"
+
+[extra]
+# Navbar menu
+menu = [
+  { path = "/", name = "公告" },
+  { path = "categories", name = "分类" },
+  { path = "tags", name = "标签" },
+  { path = "about", name = "关于" }
+]
