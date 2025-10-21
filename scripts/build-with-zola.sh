@@ -14,7 +14,7 @@ get_download_url() {
   echo "Resolving latest Zola release asset for ${ASSET}..."
   local url
   url=$(curl -fsSL https://api.github.com/repos/${REPO}/releases/latest \
-    | grep -Eo "https://[^"]+${ASSET}" \
+    | grep -Eo "https://[^\"]+${ASSET}" \
     | head -n1 || true)
   if [ -n "$url" ]; then
     echo "$url"
