@@ -3,6 +3,9 @@ title = "SpiceSoft 第三方服务发布页"
 description = "SpiceSoft 第三方服务汇总与访问说明"
 date = 2025-10-21
 draft = false
+[taxonomies]
+categories = ["第三方服务"]
+tags = ["公告", "服务"]
 [extra]
 pinned = true
 +++

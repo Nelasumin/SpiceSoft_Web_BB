@@ -5,9 +5,13 @@
     </url>
     <url>
         <loc>https://board.spicesoft.cn/about/</loc>
+        <lastmod>2025-10-21</lastmod>
     </url>
     <url>
         <loc>https://board.spicesoft.cn/categories/</loc>
+    </url>
+    <url>
+        <loc>https://board.spicesoft.cn/categories/di-san-fang-fu-wu/</loc>
     </url>
     <url>
         <loc>https://board.spicesoft.cn/page/1/</loc>
@@ -24,5 +28,11 @@
     </url>
     <url>
         <loc>https://board.spicesoft.cn/tags/</loc>
+    </url>
+    <url>
+        <loc>https://board.spicesoft.cn/tags/fu-wu/</loc>
+    </url>
+    <url>
+        <loc>https://board.spicesoft.cn/tags/gong-gao/</loc>
     </url>
 </urlset>

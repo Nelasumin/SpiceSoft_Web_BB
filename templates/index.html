@@ -23,19 +23,18 @@
     <input id="search" type="search" placeholder="搜索公告..." />
   </div>
 
-  {# 使用分页页集；若未启用分页则回退 #}
-  {% if paginator is defined %}
+  {# 只展示 posts 分区的文章，避免把关于页纳入列表 #}
+  {% set posts_section = get_section(path="posts/_index.md") %}
+  {% if posts_section is defined %}
+    {% set items = posts_section.pages %}
+  {% elif paginator is defined %}
     {% set items = paginator.pages %}
   {% else %}
     {% set items = section.pages %}
-    {% set posts_section = get_section(path="posts/_index.md") %}
-    {% if items | length == 0 and posts_section is defined %}
-      {% set items = posts_section.pages %}
-    {% endif %}
   {% endif %}
 
   {% if items | length > 0 %}
-    {# 置顶公告 #}
+    {# 置顶公告（优先展示） #}
     {% for page in items %}
       {% if page.extra.pinned %}
         {% set sev = page.extra.severity | default(value="info") %}
@@ -45,8 +44,8 @@
         {% elif sev == "outage" %}{% set sev_label = "故障" %}
         {% elif sev == "security" %}{% set sev_label = "安全" %}
         {% elif sev != "info" %}{% set sev_label = "其他" %}{% endif %}
-        <article class="card pinned" data-severity="{{ sev }}" data-status="{{ stat }}" data-pinned="true">
-          <div class="card-head">
+        <article class="card">
+          <div class="badges">
             <span class="badge badge-pinned">置顶</span>
             <span class="badge badge-{{ sev }}">{{ sev_label }}</span>
             <span class="badge badge-status-{{ stat }}">{% if stat == "active" %}进行中{% else %}已解决{% endif %}</span>
@@ -54,11 +53,18 @@
           <h2><a href="{{ page.permalink }}">{{ page.title }}</a></h2>
           {% if page.date %}<time datetime="{{ page.date | date(format="%Y-%m-%d") }}">{{ page.date | date(format="%Y-%m-%d") }}</time>{% endif %}
           {% if page.summary %}<p>{{ page.summary | safe }}</p>{% endif %}
+          {% if page.taxonomies and page.taxonomies.tags %}
+            <div class="tags">
+              {% for tag in page.taxonomies.tags %}
+                <a class="tag" href="{{ get_taxonomy_url(kind='tags', name=tag) }}">#{{ tag }}</a>
+              {% endfor %}
+            </div>
+          {% endif %}
         </article>
       {% endif %}
     {% endfor %}
 
-    <div class="list" id="cards">
+    <div class="cards">
       {% for page in items %}
         {% if not page.extra.pinned %}
           {% set sev = page.extra.severity | default(value="info") %}
@@ -68,8 +74,8 @@
           {% elif sev == "outage" %}{% set sev_label = "故障" %}
           {% elif sev == "security" %}{% set sev_label = "安全" %}
           {% elif sev != "info" %}{% set sev_label = "其他" %}{% endif %}
-          <article class="card" data-severity="{{ sev }}" data-status="{{ stat }}" data-pinned="false">
-            <div class="card-head">
+          <article class="card">
+            <div class="badges">
               <span class="badge badge-{{ sev }}">{{ sev_label }}</span>
               <span class="badge badge-status-{{ stat }}">{% if stat == "active" %}进行中{% else %}已解决{% endif %}</span>
             </div>
@@ -88,7 +94,6 @@
       {% endfor %}
     </div>
 
-    {# 分页导航 #}
     {% if paginator is defined and paginator.number_pagers > 1 %}
       <nav class="pager" aria-label="分页导航">
         <span class="muted">第 {{ paginator.current_index }} / {{ paginator.number_pagers }} 页</span>
