@@ -2,21 +2,31 @@
 set -euo pipefail
 
 REPO="getzola/zola"
-ASSET_SUFFIX="x86_64-unknown-linux-gnu.tar.gz"
-FALLBACK_VERSION="${ZOLA_VERSION:-v0.19.2}"
+ASSET="x86_64-unknown-linux-gnu.tar.gz"
+VERSION="${ZOLA_VERSION:-}"
+BIN_DIR=".bin"
 
-echo "Resolving latest Zola release asset for ${ASSET_SUFFIX}..."
-ZOLA_URL=$(curl -s https://api.github.com/repos/${REPO}/releases/latest \
-  | grep -Eo "https://[^"]+${ASSET_SUFFIX}" \
-  | head -n1 || true)
+get_download_url() {
+  if [ -n "$VERSION" ]; then
+    echo "https://github.com/${REPO}/releases/download/${VERSION}/zola-${VERSION}-${ASSET}"
+    return
+  fi
+  echo "Resolving latest Zola release asset for ${ASSET}..."
+  local url
+  url=$(curl -fsSL https://api.github.com/repos/${REPO}/releases/latest \
+    | grep -Eo "https://[^"]+${ASSET}" \
+    | head -n1 || true)
+  if [ -n "$url" ]; then
+    echo "$url"
+  else
+    local fallback="v0.19.2"
+    echo "https://github.com/${REPO}/releases/download/${fallback}/zola-${fallback}-${ASSET}"
+  fi
+}
 
-if [ -z "${ZOLA_URL}" ]; then
-  echo "Latest asset not found via API, falling back to ${FALLBACK_VERSION}"
-  ZOLA_URL="https://github.com/${REPO}/releases/download/${FALLBACK_VERSION}/zola-${FALLBACK_VERSION}-${ASSET_SUFFIX}"
-fi
-
-echo "Downloading Zola from: ${ZOLA_URL}"
-curl -L "${ZOLA_URL}" -o zola.tgz
+ZOLA_URL=$(get_download_url)
+echo "Downloading Zola (Linux x86_64) from: ${ZOLA_URL}"
+curl -fsSL -H "Accept: application/octet-stream" "${ZOLA_URL}" -o zola.tgz
 
 echo "Verifying archive..."
 if ! tar -tf zola.tgz >/dev/null 2>&1; then
@@ -25,13 +35,15 @@ if ! tar -tf zola.tgz >/dev/null 2>&1; then
   exit 2
 fi
 
-echo "Extracting Zola..."
-tar -xzf zola.tgz
+mkdir -p "${BIN_DIR}"
+echo "Extracting Zola to ${BIN_DIR}/..."
+tar -xzf zola.tgz -C "${BIN_DIR}"
+chmod +x "${BIN_DIR}/zola" || true
 
 echo "Zola version:"
-./zola --version || true
+"${BIN_DIR}/zola" --version || true
 
 echo "Building site with Zola..."
-./zola build
+"${BIN_DIR}/zola" build
 
 echo "✅ Build completed. Output directory: ./public"
